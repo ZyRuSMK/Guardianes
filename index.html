@@ -66,7 +66,19 @@
         }
 
         .intro-title { 
-            font-size: 2.2rem; margin-bottom: 10px; font-weight: normal; 
+            font-size: 2.4rem; margin-bottom: 10px; font-weight: normal; 
+            color: var(--divine-gold); 
+            text-transform: uppercase; letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        .intro-title2 { 
+            font-size: 2.1rem; margin-bottom: 10px; font-weight: normal; 
+            color: var(--divine-gold); 
+            text-transform: uppercase; letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        .intro-title3 { 
+            font-size: 1.8rem; margin-bottom: 10px; font-weight: normal; 
             color: var(--divine-gold); 
             text-transform: uppercase; letter-spacing: 3px;
             text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
@@ -188,23 +200,84 @@
         }
         #book-container.visible { display: block; opacity: 1; }
 
-        h1 { margin-top: 3em; border-bottom: 2px solid var(--interface-border); padding-bottom: 15px; font-family: sans-serif; text-transform: uppercase; color: var(--accent-color); letter-spacing: 1px; text-align: center; }
-        h2 { margin-top: 2.5em; color: var(--accent-color); font-family: sans-serif; border-left: 3px solid var(--interface-border); padding-left: 15px;}
-        p { margin-bottom: 1.8em; text-align: justify; }
+        h1 { margin-top: .9em; border-bottom: 2px solid var(--interface-border); padding-bottom: 15px; font-family: sans-serif; text-transform: uppercase; color: var(--accent-color); letter-spacing: 1px; text-align: center; }
+        h2 { margin-top: .9em; color: var(--accent-color); font-family: sans-serif; border-left: 3px solid var(--interface-border); padding-left: 15px; text-align: center;}
+        h3 { margin-top: .9em; color: var(--accent-color); font-family: sans-serif; border-left: 3px solid var(--interface-border); padding-left: 15px; text-align: center;}
+        p { margin-top: .9em; margin-bottom: 1.8em; text-align: justify;}
+        .placeholder { color: #999; font-style: italic; background: rgba(0,0,0,0.03); padding: 15px; border: 1px dashed var(--interface-border); }
+        p2 { margin-top: .9em; margin-bottom: 1.8em; text-align: center; }
         .placeholder { color: #999; font-style: italic; background: rgba(0,0,0,0.03); padding: 15px; border: 1px dashed var(--interface-border); }
 
+         /* --- 6. ESTILOS DE REDES SOCIALES (MEJORADO) --- */
+        .social-footer-section {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid var(--interface-border);
+            text-align: center;
+            width: 100%;
+            max-width: 700px;
+        }
+        
+        .footer-title {
+            font-family: sans-serif; text-transform: uppercase;
+            letter-spacing: 2px; color: var(--accent-color);
+            margin-bottom: 25px; font-size: 0.9em;
+        }
+
+        .social-links {
+            display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-bottom: 30px;
+        }
+
+        .social-btn {
+            text-decoration: none; color: var(--text-color);
+            border: 1px solid var(--interface-border);
+            padding: 10px 25px; border-radius: 50px;
+            font-family: sans-serif; font-size: 0.85em;
+            transition: all 0.3s ease; letter-spacing: 1px;
+            text-transform: uppercase; background: transparent;
+        }
+
+        .social-btn:hover {
+            background-color: var(--button-glow);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--button-glow);
+            transform: translateY(-2px);
+        }
+
+        .copyright {
+            font-size: 0.75em; opacity: 0.6; font-style: italic; margin-top: 20px;
+        }
+
+        /* AJUSTES ESPECÍFICOS PARA EL FOOTER EN LA INTRO (FONDO OSCURO) */
+        #intro-screen .social-footer-section {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 20px;
+        }
+        #intro-screen .footer-title { color: var(--divine-gold); }
+        #intro-screen .social-btn { 
+            color: #ddd; 
+            border-color: rgba(212, 175, 55, 0.4); 
+        }
+        #intro-screen .social-btn:hover {
+            color: #fff;
+            border-color: var(--divine-gold);
+            background: rgba(212, 175, 55, 0.2);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
         /* TEMAS */
-        body.theme-light { 
+        body.theme-light {
             --bg-color: #fcfaf2; --text-color: #2a2a2a; 
             --panel-bg: #ffffff; --interface-border: #eaddc5; 
             --button-glow: var(--divine-light); --accent-color: var(--divine-gold);
         }
-        body.theme-sepia { 
+        body.theme-sepia {
             --bg-color: #f0e6d2; --text-color: #4a3b2a; 
             --panel-bg: #eaddc5; --interface-border: #d1c4a8;
             --button-glow: rgba(212, 175, 55, 0.1); --accent-color: #8c734b;
         }
-        body.theme-dark { 
+        body.theme-dark {
             --bg-color: #121214; --text-color: #d0d0d0; 
             --panel-bg: var(--infernal-dark); --interface-border: #3a2a2a; 
             --button-glow: var(--infernal-glow); --accent-color: var(--infernal-ember);
@@ -215,25 +288,61 @@
 
     <div id="intro-screen">
         <div class="cover-container">
-            <img src="https://via.placeholder.com/300x450/2c2c2c/d4af37?text=Ciclo+3" alt="Portada" class="book-cover-img">
-            <h1 class="intro-title" style="border:none;">Ciclo 3</h1>
-            <p class="intro-subtitle">El perfecto desastre</p>
-            <button class="btn-start" onclick="enterBook()">✦ LEER AHORA ✦</button>
+            <img src="./portada.jpg" alt="Portada" class="book-cover-img">
+
+            <h1 class="intro-title" style="border:none;">Guardianes</h1>
+            <h2 class="intro-title2" style="border:none;">Amor y Dualidad</h2>
+            <h3 class="intro-title3" style="border:none;">Dualidad - Infiernos & Cielos & Dualidad</h3>
+            <p2 class="intro-subtitle">DICIEMBRE 2025 <br> MIGUEL ALFONSO VENEGAS SÁNCHEZ</p2>
+        </div>
+        <div class="cover-container">
+            <button class="btn-start" onclick="enterBook()">✦ LEER AHORA ✦</button>    
         </div>
         
         <div class="intro-section">
             <h3>Sinopsis</h3>
             <p class="intro-text">
-                [...PEGA AQUÍ TU CONTRAPORTADA...]
+                
+                ¿ESTÁS LISTO PARA IRTE DE ESTA VIDA? <br>
+                Para la mayoría, la muerte es el final. No solo la física, sino la emocional y la espiritual. Pero para la minoría que logra regresar del abismo, esa muerte es solo el comienzo. <br>
+                Esta obra nace de una premisa inquietante: para comprender la experiencia humana, a veces hay que morir viviéndola. <br>
+                Todos tenemos un detonante. Sucesos, personas o creencias que nos empujaron a ese abismo donde nos perdimos a nosotros mismos. Fue allí, en la oscuridad, donde nos obligaron a ser valientes. Fue allí donde comprendimos que éramos suficientes para el reto, descubriendo quiénes somos realmente y quiénes estuvieron ahí para nuestro despertar. <br>
+                Guiado por un Guardián que enseña el lenguaje olvidado de la intuición, el protagonista descubre que la realidad trasciende lo físico y es, ante todo, maleable. <br>
+                Pero este conocimiento conlleva una inmensa responsabilidad: al obtener el poder para derribar a tus opresores, caminas sobre la delgada línea entre la justicia y la venganza. Un paso en falso, y te convertirás en el monstruo que juraste destruir. <br>
+                Más que una novela, este es un mapa sobre la congruencia: el arte de alinear pensamiento, emoción y acción. Un recordatorio de que, al final, está bien volver a creer. Está bien volver a iniciar. Está bien volver a nacer. <br>
+                Atrévete a escuchar, atrévete a comprender y atrévete a compartir lo que el silencio intenta decirte. <br>
+
+
             </p>
         </div>
         
         <div class="intro-section">
-            <h3>Video</h3>
+            <h3>Introduccion</h3>
             <div class="video-wrapper">
                 <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Trailer" allowfullscreen></iframe>
             </div>
         </div>
+
+        <div class="intro-section">
+            <h1>Todos los derechos reservados.</h1>
+            <h2>
+            Ninguna parte de esta obra puede ser reproducida, almacenada en un sistema de recuperación o transmitida en ninguna forma o por ningún medio, electrónico, mecánico, fotocopia, grabación o cualquier otro, sin el permiso previo y por escrito del autor. <br>
+            Este libro es una obra de ficción. <br>
+            Los nombres, personajes, lugares y sucesos son producto de la imaginación del autor o se utilizan de manera ficticia. 
+            Cualquier semejanza con personas reales, vivas o muertas, o con eventos reales, es mera coincidencia.
+           </h2>
+        </div>
+
+        <div class="social-footer-section">
+            <div class="footer-title">✦ Sigue al Autor ✦</div>
+            <div class="social-links">
+                <a href="#" class="social-btn">YouTube</a>
+                <a href="#" class="social-btn">TickTock</a>
+                <a href="#" class="social-btn">Facebook</a>
+            </div>
+            <p class="copyright" style="color:#888">© 2026 Ciclo 3</p>
+        </div>
+
         <div style="height: 100px;"></div>
     </div>
 
@@ -338,6 +447,15 @@
         <h2>Sobre el autor</h2>
         <p class="placeholder">[...TEXTO...]</p>
 
+        <div class="social-footer-section">
+            <div class="footer-title">✦ Conecta con el Autor ✦</div>
+            <div class="social-links">
+                <a href="#" class="social-btn">Instagram</a>
+                <a href="#" class="social-btn">Twitter / X</a>
+                <a href="#" class="social-btn">Facebook</a>
+            </div>
+            <p class="copyright">© 2026 Ciclo 3. Todos los derechos reservados.</p>
+        </div>
         <div style="height: 300px;"></div>
     </div>
 
