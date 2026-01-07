@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lector Místico: Ciclo 3</title>
+    <style>
+        /* --- 1. VARIABLES Y ESTILOS BASE --- */
+        :root {
+            /* Colores Base */
+            --bg-color: #fcfaf2; 
+            --text-color: #2c2c2c;
+            
+            /* --- PALETA MÍSTICA --- */
+            /* Divino (Día) */
+            --divine-gold: #d4af37; 
+            --divine-light: rgba(212, 175, 55, 0.15);
+            /* Infernal (Noche) */
+            --infernal-ember: #c0392b;
+            --infernal-dark: #121214;
+            --infernal-glow: rgba(192, 57, 43, 0.2);
+
+            /* Variables de Interfaz Dinámicas */
+            --panel-bg: #fdfbf7;    
+            --interface-border: #e0d5b7; 
+            --button-glow: var(--divine-light); 
+            --accent-color: var(--divine-gold);
+
+            --font-family: 'Times New Roman', Times, serif; 
+            --font-size: 19px;
+            --line-height: 1.6;
+            --max-width: 720px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            transition: all 0.4s ease;
+            overflow-x: hidden;
+        }
+
+        /* --- 2. PANTALLA DE BIENVENIDA --- */
+        #intro-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, #1a1a24, #0f0f1a);
+            color: #e0e0e0;
+            z-index: 3000; /* Z-Index muy alto para tapar todo */
+            overflow-y: auto;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 40px 20px; font-family: sans-serif;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+        
+        #intro-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        .cover-container { text-align: center; max-width: 500px; width: 100%; margin-bottom: 30px; }
+        
+        .book-cover-img {
+            width: 100%; max-width: 300px; height: auto;
+            border-radius: 4px; margin-bottom: 20px;
+            box-shadow: 0 -5px 20px rgba(212, 175, 55, 0.3), 0 10px 30px rgba(192, 57, 43, 0.4);
+            border: 1px solid #333;
+        }
+
+        .intro-title { 
+            font-size: 2.2rem; margin-bottom: 10px; font-weight: normal; 
+            color: var(--divine-gold); 
+            text-transform: uppercase; letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+        .intro-subtitle { font-size: 1.2rem; color: #aaa; margin-bottom: 30px; font-style: italic; letter-spacing: 1px;}
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--divine-gold), var(--infernal-ember));
+            color: #fff;
+            padding: 15px 50px; font-size: 1.3rem; font-weight: bold;
+            border: none; border-radius: 2px; cursor: pointer;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+            transition: transform 0.3s;
+            margin-bottom: 40px; font-family: serif; text-transform: uppercase; letter-spacing: 2px;
+        }
+        .btn-start:hover { transform: scale(1.03); }
+
+        .intro-section {
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 25px; border-radius: 4px;
+            max-width: 700px; width: 100%; margin-bottom: 30px;
+            text-align: left;
+        }
+        .intro-section h3 { 
+            border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; 
+            color: var(--divine-gold); font-family: serif; letter-spacing: 1px;
+        }
+        .intro-text { line-height: 1.7; color: #ccc; font-size: 1.05rem; }
+
+        .video-wrapper {
+            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 4px; 
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5); border: 1px solid #333;
+        }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+        /* --- 3. BARRA DE HERRAMIENTAS --- */
+        #toolbar {
+            position: fixed; top: 0; left: 0; right: 0; height: 64px;
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--interface-border);
+            box-shadow: 0 2px 15px var(--button-glow);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 15px; 
+            z-index: 2000; /* Asegurar que esté encima del contenido */
+            opacity: 0; pointer-events: none; transition: opacity 0.5s;
+        }
+        #toolbar.visible { opacity: 1; pointer-events: auto; }
+
+        .toolbar-group { display: flex; gap: 12px; align-items: center; }
+        
+        button.tool-btn {
+            background: rgba(0,0,0,0.02); 
+            border: 1px solid var(--interface-border);
+            font-size: 1.2rem; cursor: pointer; padding: 8px 12px; 
+            color: var(--text-color); border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        button.tool-btn:hover { 
+            background-color: var(--button-glow);
+            color: var(--accent-color);
+        }
+
+        #progress-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: rgba(0,0,0,0.1); }
+        #progress-bar { height: 100%; background: var(--accent-color); width: 0%; transition: width 0.1s; }
+
+        /* --- 4. PANELES LATERALES (CORREGIDOS) --- */
+        .side-panel {
+            position: fixed; top: 64px; bottom: 0;
+            width: 300px; 
+            background: var(--panel-bg);
+            padding: 25px; 
+            z-index: 1500; /* Encima del libro, debajo de la intro */
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            overflow-y: auto; 
+            box-shadow: 0 0 30px rgba(0,0,0,0.15);
+            border: 1px solid var(--interface-border);
+            /* Asegurar visibilidad base */
+            display: block; 
+        }
+
+        /* Estado cerrado */
+        #toc-panel { left: 0; transform: translateX(-110%); border-right: 1px solid var(--interface-border); }
+        #settings-panel { right: 0; transform: translateX(110%); border-left: 1px solid var(--interface-border); }
+        
+        /* Estado abierto */
+        .side-panel.open { transform: translateX(0) !important; }
+        
+        /* Estilos lista */
+        .toc-list { list-style: none; font-family: sans-serif; font-size: 14px; }
+        .toc-item { margin-bottom: 10px; }
+        .toc-link { 
+            text-decoration: none; color: var(--text-color); display: block; 
+            padding: 8px 10px; border-radius: 2px; transition: all 0.2s; 
+            border: 1px solid transparent; 
+        }
+        .toc-link:hover { background: var(--button-glow); color: var(--accent-color); }
+        
+        .toc-h1 { font-weight: bold; border-bottom: 1px solid var(--interface-border); margin-top: 15px; color: var(--accent-color); letter-spacing: 1px; text-transform: uppercase; }
+        .toc-h2 { margin-left: 15px; border-left: 2px solid var(--interface-border); padding-left: 12px; font-size: 0.95em; opacity: 0.9;}
+        
+        /* Botones Ajustes */
+        .btn-font { 
+            padding: 12px; width: 100%; margin-bottom: 5px; cursor: pointer; 
+            border: 1px solid var(--interface-border); 
+            background: rgba(0,0,0,0.02); 
+            color: var(--text-color); border-radius: 3px; transition: all 0.3s;
+        }
+        .btn-font.active {
+            background: var(--button-glow); border-color: var(--accent-color); font-weight: bold;
+        }
+
+        /* --- 5. CONTENIDO DEL LIBRO --- */
+        #book-container {
+            max-width: var(--max-width);
+            margin: 100px auto 80px; padding: 0 30px;
+            font-size: var(--font-size); line-height: var(--line-height);
+            display: none; opacity: 0; transition: opacity 1s;
+        }
+        #book-container.visible { display: block; opacity: 1; }
+
+        h1 { margin-top: 3em; border-bottom: 2px solid var(--interface-border); padding-bottom: 15px; font-family: sans-serif; text-transform: uppercase; color: var(--accent-color); letter-spacing: 1px; text-align: center; }
+        h2 { margin-top: 2.5em; color: var(--accent-color); font-family: sans-serif; border-left: 3px solid var(--interface-border); padding-left: 15px;}
+        p { margin-bottom: 1.8em; text-align: justify; }
+        .placeholder { color: #999; font-style: italic; background: rgba(0,0,0,0.03); padding: 15px; border: 1px dashed var(--interface-border); }
+
+        /* TEMAS */
+        body.theme-light { 
+            --bg-color: #fcfaf2; --text-color: #2a2a2a; 
+            --panel-bg: #ffffff; --interface-border: #eaddc5; 
+            --button-glow: var(--divine-light); --accent-color: var(--divine-gold);
+        }
+        body.theme-sepia { 
+            --bg-color: #f0e6d2; --text-color: #4a3b2a; 
+            --panel-bg: #eaddc5; --interface-border: #d1c4a8;
+            --button-glow: rgba(212, 175, 55, 0.1); --accent-color: #8c734b;
+        }
+        body.theme-dark { 
+            --bg-color: #121214; --text-color: #d0d0d0; 
+            --panel-bg: var(--infernal-dark); --interface-border: #3a2a2a; 
+            --button-glow: var(--infernal-glow); --accent-color: var(--infernal-ember);
+        }
+    </style>
+</head>
+<body class="theme-light">
+
+    <div id="intro-screen">
+        <div class="cover-container">
+            <img src="https://via.placeholder.com/300x450/2c2c2c/d4af37?text=Ciclo+3" alt="Portada" class="book-cover-img">
+            <h1 class="intro-title" style="border:none;">Ciclo 3</h1>
+            <p class="intro-subtitle">El perfecto desastre</p>
+            <button class="btn-start" onclick="enterBook()">✦ LEER AHORA ✦</button>
+        </div>
+        
+        <div class="intro-section">
+            <h3>Sinopsis</h3>
+            <p class="intro-text">
+                [...PEGA AQUÍ TU CONTRAPORTADA...]
+            </p>
+        </div>
+        
+        <div class="intro-section">
+            <h3>Video</h3>
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Trailer" allowfullscreen></iframe>
+            </div>
+        </div>
+        <div style="height: 100px;"></div>
+    </div>
+
+    <div id="toolbar">
+        <div class="toolbar-group">
+            <button class="tool-btn" onclick="togglePanel('toc-panel')">☰ Índice</button>
+        </div>
+        <span style="font-weight:bold; font-family:serif; letter-spacing:1px; color:var(--accent-color);">CICLO 3</span>
+        <div class="toolbar-group">
+            <button class="tool-btn" onclick="scrollToTop()">🔝</button>
+            <button class="tool-btn" onclick="togglePanel('settings-panel')">⚙️ Aa</button>
+        </div>
+        <div id="progress-container"><div id="progress-bar"></div></div>
+    </div>
+
+    <div id="toc-panel" class="side-panel">
+        <h3 style="text-align:center; color:var(--accent-color); margin-bottom:20px;">TABLA DE CONTENIDO</h3>
+        <ul id="toc-list" class="toc-list"></ul>
+    </div>
+
+    <div id="settings-panel" class="side-panel">
+        <h3 style="text-align:center; color:var(--accent-color); margin-bottom:20px;">AJUSTES</h3>
+        
+        <div style="margin-bottom:20px;">
+            <p style="font-weight:bold; margin-bottom:10px; font-size:0.8em; text-transform:uppercase;">Fuente</p>
+            <button class="btn-font" data-val="times" onclick="setFont('times')">Times New Roman</button>
+            <button class="btn-font" data-val="georgia" onclick="setFont('georgia')">Georgia</button>
+            <button class="btn-font" data-val="arial" onclick="setFont('arial')">Arial</button>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <p style="font-weight:bold; margin-bottom:10px; font-size:0.8em; text-transform:uppercase;">Tema</p>
+            <button class="btn-font" data-val="theme-light" onclick="setTheme('theme-light')">Divino (Día)</button>
+            <button class="btn-font" data-val="theme-sepia" onclick="setTheme('theme-sepia')">Pergamino</button>
+            <button class="btn-font" data-val="theme-dark" onclick="setTheme('theme-dark')">Infernal (Noche)</button>
+        </div>
+
+        <div>
+            <p style="font-weight:bold; margin-bottom:10px; font-size:0.8em; text-transform:uppercase;">Tamaño</p>
+            <button class="btn-font" onclick="changeFontSize(1)">Aumentar (+)</button>
+            <button class="btn-font" onclick="changeFontSize(-1)">Disminuir (-)</button>
+        </div>
+    </div>
+
+    <div id="book-container">
+        <h1>1. Prefacio</h1>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h1>2. Introducción</h1>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h1>3. Recomendaciones</h1>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h1>4. Ciclo 3 Capítulo 1:<br>El perfecto desastre</h1>
+        <p style="text-align:center; font-style:italic; color:var(--accent-color);">¡El final de un inicio!... o, ¿El inicio de un final?...</p>
+        <p>Aquí comienza tu historia real...</p>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h2>5. Cambio de planes</h2>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h2>6. La bifurcación</h2>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h1>7. Capítulo 2:<br>Inocente ignorancia</h1>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h2>8. Ancestros Arcanos</h2>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h2>9. ¿La consumación del vínculo?</h2>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h1>10. Capítulo 3:<br>La caída del velo</h1>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h2>11. ¿Subiendo al infierno o descendiendo a los cielos?</h2>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h2>12. Nuevos inicios</h2>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h2>13. Contratos ancestrales</h2>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h2>14. ¿Encuentro con Dios?</h2>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h2>15. El preludio de la guerra dimensional</h2>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h1>16. Epílogo</h1>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h1>17. Glosario</h1>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <h1>18. Notas del Autor</h1>
+        <h2>Agradecimientos Finales</h2>
+        <p class="placeholder">[...TEXTO...]</p>
+        <h2>Sobre el autor</h2>
+        <p class="placeholder">[...TEXTO...]</p>
+
+        <div style="height: 300px;"></div>
+    </div>
+
+    <script>
+        // --- JAVASCRIPT CORREGIDO ---
+        const root = document.documentElement;
+        const body = document.body;
+        
+        // 1. Entrar al libro
+        function enterBook() {
+            const intro = document.getElementById('intro-screen');
+            intro.classList.add('hidden');
+            document.getElementById('toolbar').classList.add('visible');
+            document.getElementById('book-container').classList.add('visible');
+            
+            setTimeout(() => {
+                intro.style.display = 'none'; // Quitar del DOM
+                // Recuperar posición
+                const savedPos = localStorage.getItem('readPosition');
+                if (savedPos && parseInt(savedPos) > 100) {
+                    window.scrollTo({ top: parseInt(savedPos), behavior: 'smooth' });
+                }
+            }, 800);
+        }
+
+        // 2. Control de Paneles (Índice y Ajustes)
+        function togglePanel(id) {
+            const panel = document.getElementById(id);
+            const isOpen = panel.classList.contains('open');
+
+            // Cerrar todos primero
+            document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('open'));
+            
+            // Si no estaba abierto, abrirlo
+            if (!isOpen) {
+                panel.classList.add('open');
+            }
+        }
+        
+        // Cerrar paneles al tocar fuera (en el libro)
+        document.getElementById('book-container').addEventListener('click', () => {
+            document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('open'));
+        });
+
+        // 3. Generar Índice Automático
+        function generateTOC() {
+            const tocList = document.getElementById('toc-list');
+            const content = document.getElementById('book-container');
+            const headers = content.querySelectorAll('h1, h2');
+
+            headers.forEach((header, index) => {
+                if (!header.id) header.id = 'sec-' + index;
+                const li = document.createElement('li');
+                li.className = 'toc-item';
+                const a = document.createElement('a');
+                a.href = '#' + header.id;
+                // Limpiar texto
+                a.textContent = header.innerText.split('\n')[0].replace(/:/g, '');
+                a.className = 'toc-link';
+                
+                if (header.tagName === 'H1') a.classList.add('toc-h1');
+                if (header.tagName === 'H2') a.classList.add('toc-h2');
+
+                a.onclick = (e) => {
+                    // Cerrar panel al hacer click
+                    togglePanel('toc-panel');
+                };
+                li.appendChild(a);
+                tocList.appendChild(li);
+            });
+        }
+
+        // 4. Configuración (Fuentes y Temas)
+        // Función auxiliar para marcar botón activo visualmente
+        function updateActiveButtons(selector, value) {
+            document.querySelectorAll(selector).forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.dataset.val === value) btn.classList.add('active');
+            });
+        }
+
+        function setFont(type) {
+            let fontStack = "'Times New Roman', serif";
+            if (type === 'arial') fontStack = "'Arial', sans-serif";
+            if (type === 'georgia') fontStack = "'Georgia', serif";
+
+            root.style.setProperty('--font-family', fontStack);
+            localStorage.setItem('fontType', type);
+            updateActiveButtons('.btn-font', type);
+        }
+
+        function setTheme(theme) {
+            body.className = theme;
+            localStorage.setItem('theme', theme);
+            updateActiveButtons('.btn-font', theme);
+        }
+
+        let currentFontSize = 19;
+        function changeFontSize(amount) {
+            currentFontSize += amount;
+            if(currentFontSize < 14) currentFontSize = 14;
+            if(currentFontSize > 28) currentFontSize = 28;
+            root.style.setProperty('--font-size', currentFontSize + 'px');
+            localStorage.setItem('fontSize', currentFontSize);
+        }
+
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+        // 5. Scroll y Barra de Progreso
+        window.onscroll = function() {
+            if(document.getElementById('book-container').classList.contains('visible')) {
+                let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+                let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                let scrolled = (winScroll / height) * 100;
+                document.getElementById("progress-bar").style.width = scrolled + "%";
+                localStorage.setItem('readPosition', winScroll);
+            }
+        };
+
+        // 6. Inicialización (Cargar datos guardados)
+        window.onload = function() {
+            try {
+                generateTOC();
+
+                // Cargar tema
+                const savedTheme = localStorage.getItem('theme') || 'theme-light';
+                setTheme(savedTheme);
+
+                // Cargar fuente
+                const savedFont = localStorage.getItem('fontType') || 'times';
+                setFont(savedFont);
+
+                // Cargar tamaño
+                const savedSize = localStorage.getItem('fontSize');
+                if(savedSize) { 
+                    currentFontSize = parseInt(savedSize); 
+                    root.style.setProperty('--font-size', currentFontSize + 'px'); 
+                }
+            } catch (e) {
+                console.error("Error iniciando:", e);
+            }
+        };
+    </script>
+</body>
+</html>
